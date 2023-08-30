@@ -15,7 +15,7 @@ today_day_number, zulu_time = day_number_and_zulu_time.day_ztime_info()[2], day_
 
 total_cost_throughout_month = {}
 
-for i in range(1, int(yesterday_date[2]) + 1): #int(yesterday_date[2])
+for i in range(int(yesterday_date[2]), int(yesterday_date[2]) + 1): #int(yesterday_date[2])
   def finding_the_cost_per_agent():
     nameSpace = ""
     teams_string_data = ''
@@ -100,36 +100,35 @@ for i in range(1, int(yesterday_date[2]) + 1): #int(yesterday_date[2])
 
     def index_info_to_es():
       information_to_send_to_es = {
-        "StartTime": startTime,
-        "EndTime": endTime,
-        "Current Day": yesterday_date[1] + '/' + str(i) + '/' + yesterday_date[0],
+        "starttime": startTime,
+        "endtime": endTime,
+        "current_day": yesterday_date[1] + '/' + str(i) + '/' + yesterday_date[0],
         "@timestamp": zulu_time,
-        "Number of Namespaces": cnt,
-        "Active Namespaces": active_namespaces,
-        "Agents": client_agent_dictionary,
-        "Total Agents": total_agents,
-        "Cost for Capacity": float(myCost),
-        "Cost Stats": {
-          "Total Daily Cost": individual_platform_cost,
-          "Data_In": round(json_response["costs"]["dimensions"][1]["cost"],2),
-          "Data_Internode": round(json_response["costs"]["dimensions"][2]["cost"],2),
-          "Data_Out": round(json_response["costs"]["dimensions"][3]["cost"],2),
-          "Storage_Api": round(json_response["costs"]["dimensions"][4]["cost"],2),
-          "Storage_Bytes": round(json_response["costs"]["dimensions"][5]["cost"],2),
-          "Storage Costs": round(storeCost,2),
-          "AWS Data Transfer In (per GB) Actual was": float(awsDataInActual0),
-          "AWS Data Transfer In (per GB) Formatted Value": str(awsDataInFormatted0),
-          "AWS Data Transfer Inter-Node (per GB) Actual was": float(awsDataXferInternodeActual),
-          "AWS Data Transfer Inter-Node Formatted Value": str(awsDataXferInternodeFormatted),
-          "AWS Data Transfer Out (per GB) Actual was": float(awsDataXferOutActual),
-          "AWS Data Transfer Out (per GB) Formatted Value": str(awsDataXferOutFormatted),
-          "AWS Snapshot Storage API (1K Requests) Actual was": float(awsDataStorageAPIActual),
-          "AWS Snapshot Storage API (1K Requests) Formatted Value": str(awsDataStorageAPIFormatted),
-          "AWS Snapshot Storage (per GB-month) Actual was": float(awsDataSnapshotStorageActual),
-          "AWS Snapshot Storage (per GB-month) Formatted Value": str(awsDataSnapshotStorageFormatted)},
-        "Total Platform Cost":total_platform_cost,
-        "Average Cost per Agent": float(str_cost_per_agent),
-        "Total Cost up to " + yesterday_date[1] + "/" + str(i): total_expenses
+        "number_of_namespaces": cnt,
+        "active_namespaces": active_namespaces,
+        "agents": client_agent_dictionary,
+        "total_agents": total_agents,
+        "cost_for_capacity": float(myCost),
+        "cost_stats": {
+          "total_daily_cost": individual_platform_cost,
+          "data_in": round(json_response["costs"]["dimensions"][1]["cost"],2),
+          "data_internode": round(json_response["costs"]["dimensions"][2]["cost"],2),
+          "data_out": round(json_response["costs"]["dimensions"][3]["cost"],2),
+          "storage_api": round(json_response["costs"]["dimensions"][4]["cost"],2),
+          "storage_bytes": round(json_response["costs"]["dimensions"][5]["cost"],2),
+          "storage_costs": round(storeCost,2),
+          "data_in_actual": float(awsDataInActual0),
+          "data_in_formatted": str(awsDataInFormatted0),
+          "data_internode_actual": float(awsDataXferInternodeActual),
+          "data_internode_formatted": str(awsDataXferInternodeFormatted),
+          "data_transfer_out_actual": float(awsDataXferOutActual),
+          "data_transfer_out_formatted": str(awsDataXferOutFormatted),
+          "snapshot_storage_api_actual": float(awsDataStorageAPIActual),
+          "snapshot_storage_api_formatted": str(awsDataStorageAPIFormatted),
+          "snapshot_storage_actual": float(awsDataSnapshotStorageActual),
+          "snapshot_storage_formatted": str(awsDataSnapshotStorageFormatted)},
+        "total_platform_cost":total_platform_cost,
+        "average_agent_cost": float(str_cost_per_agent)
     }
       return information_to_send_to_es
 
@@ -186,6 +185,7 @@ for i in range(1, int(yesterday_date[2]) + 1): #int(yesterday_date[2])
     # Costs
     teams_string_data = teams_string_data + "Calculating Platform Costs" + "\n--------------------------\n"
     orgID = config.get('BILLING','orgID')
+    bill_url = config.get('BILLING', 'billing_cost_url')
 
     if i <= 9:
       startTime = yesterday_date[0] + "-" + yesterday_date[1] + "-" + "0" + str(i) + "T" + "00:00:00.000" + "Z"
@@ -200,7 +200,7 @@ for i in range(1, int(yesterday_date[2]) + 1): #int(yesterday_date[2])
 
     for x in tdict:
         dep = tdict[x]
-        req = "https://api.elastic-cloud.com/api/v1/billing/costs/"+orgID+"/deployments/"+x+"/items?from="+startTime+"&to="+endTime
+        req = bill_url+orgID+"/deployments/"+x+"/items?from="+startTime+"&to="+endTime
         indxList=[]
 
         teams_string_data = teams_string_data + '"' + str(x) + '"' + ' : ' + str(dep) + newline
@@ -278,9 +278,6 @@ for i in range(1, int(yesterday_date[2]) + 1): #int(yesterday_date[2])
     total_platform_cost_statement = 'Total_platform_cost' + ' : ' + '$' + str_total_platform_cost
     teams_string_data = teams_string_data + total_platform_cost_statement + newline
 
-    total_cost_throughout_month[day_in_the_month] = total_platform_cost
-    total_expenses = sum(total_cost_throughout_month.values())
-
     cost_per_agent = total_platform_cost / total_agents
     str_cost_per_agent = str(cost_per_agent)
     str_cost_per_agent_statement = 'The cost per agent on average is ' + ': ' + '$' + str_cost_per_agent
@@ -301,11 +298,8 @@ for i in range(1, int(yesterday_date[2]) + 1): #int(yesterday_date[2])
           document=index_info_to_es()
       )
 
-    print(teams_string_data)
+    # print(teams_string_data)
+    the_teams_message = myTeamsMessage.text(teams_string_data)
+    return myTeamsMessage.send()
 
-    if i == today_day_number - 1:
-      teams_string_data = teams_string_data + "The total cost up to " + yesterday_date[1] + "/" + yesterday_date[2] + " : " + str(total_expenses)
-      the_message = myTeamsMessage.text(teams_string_data)
-      return myTeamsMessage.send()
-
-  print(finding_the_cost_per_agent())
+  finding_the_cost_per_agent()
