@@ -10,8 +10,7 @@ myTeamsMessage = pymsteams.connectorcard(config.get('MSTEAMS','mswebhook'))
 newline = "\n\n"
 
 yesterday_date = check_the_date.date()
-today_year_number, today_month_number = day_number_and_zulu_time.day_ztime_info()[0], day_number_and_zulu_time.day_ztime_info()[1]
-today_day_number = day_number_and_zulu_time.day_ztime_info()[2]
+today_year_number, today_month_number, today_day_number = day_number.day_info()[0], day_number.day_info()[1], day_number.day_info()[2]
 
 total_cost_throughout_month = {}
 
