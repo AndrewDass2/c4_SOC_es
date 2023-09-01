@@ -12,8 +12,6 @@ newline = "\n\n"
 yesterday_date = check_the_date.date()
 today_year_number, today_month_number, today_day_number = day_number.day_info()[0], day_number.day_info()[1], day_number.day_info()[2]
 
-total_cost_throughout_month = {}
-
 for i in range(int(yesterday_date[2]), int(yesterday_date[2]) + 1): #int(yesterday_date[2])
   def finding_the_cost_per_agent():
     nameSpace = ""
