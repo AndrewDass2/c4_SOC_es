@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # run file: "python ./c4_SOC_es.py -c C4SOC.ini", module_name = "TWI getCliCount", __version__ = "0.0.1"
 
-import json, requests, configparser, argparse, pymsteams, check_the_date, day_number_and_zulu_time
+import json, requests, configparser, argparse, pymsteams, datetime, check_the_date, day_number
 from elasticsearch import Elasticsearch, helpers
 
 config = configparser.ConfigParser()
@@ -11,7 +11,7 @@ newline = "\n\n"
 
 yesterday_date = check_the_date.date()
 today_year_number, today_month_number = day_number_and_zulu_time.day_ztime_info()[0], day_number_and_zulu_time.day_ztime_info()[1]
-today_day_number, zulu_time = day_number_and_zulu_time.day_ztime_info()[2], day_number_and_zulu_time.day_ztime_info()[3]
+today_day_number = day_number_and_zulu_time.day_ztime_info()[2]
 
 total_cost_throughout_month = {}
 
@@ -103,7 +103,7 @@ for i in range(int(yesterday_date[2]), int(yesterday_date[2]) + 1): #int(yesterd
         "starttime": startTime,
         "endtime": endTime,
         "current_day": yesterday_date[1] + '/' + str(i) + '/' + yesterday_date[0],
-        "@timestamp": zulu_time,
+        "@timestamp": datetime.datetime.now(),
         "number_of_namespaces": cnt,
         "active_namespaces": active_namespaces,
         "agents": client_agent_dictionary,
@@ -196,7 +196,7 @@ for i in range(int(yesterday_date[2]), int(yesterday_date[2]) + 1): #int(yesterd
 
     code, name = config.get('TDICT','code'), config.get('TDICT','name')
     tdict = {code:name}
-    total_platform_cost = 0 
+    total_platform_cost = 0
 
     for x in tdict:
         dep = tdict[x]
