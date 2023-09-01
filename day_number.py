@@ -1,7 +1,6 @@
 import datetime
-import pytz
 
-def day_ztime_info():
+def day_info():
   the_date = datetime.datetime.now()
   str_the_date = str(the_date)
 
@@ -11,7 +10,6 @@ def day_ztime_info():
 
   int_current_date_number = int(str_current_date_number)
 
-  zulu_time = datetime.datetime.now(pytz.timezone('Zulu'))
-  return str_current_date_year, str_current_date_month, int_current_date_number, zulu_time
-  
-day_ztime_info()
+  return str_current_date_year, str_current_date_month, int_current_date_number
+
+day_info()
